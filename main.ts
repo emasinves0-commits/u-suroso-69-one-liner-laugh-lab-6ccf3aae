@@ -8,16 +8,30 @@ const ENTRY_LINE =
 const OUTPUT_DIR = process.env.OUTPUT_DIR ?? "/output";
 const OUTPUT_FILE = "entry.txt";
 
-// The gate accepts 1 to 200 characters of UTF-8 text; refuse to write an
-// out-of-range line rather than submit an entry the gate would reject.
+// The gate accepts 1 to 200 characters of UTF-8 text, and the tie-break
+// favours the smaller text: refuse anything but the exact line, measured
+// in bytes, rather than submit an entry the gate would reject.
 const MAX_ENTRY_CHARS = 200;
-if (ENTRY_LINE.length < 1 || ENTRY_LINE.length > MAX_ENTRY_CHARS) {
-  throw new Error(
-    `entry line is ${ENTRY_LINE.length} characters, outside the 1-${MAX_ENTRY_CHARS} gate`,
-  );
+function checkedLine(line: string): string {
+  const trimmed = line.trim();
+  const bytes = Buffer.byteLength(trimmed, "utf8");
+  if (bytes < 1 || bytes > MAX_ENTRY_CHARS) {
+    throw new Error(
+      `entry line is ${bytes} bytes, outside the 1-${MAX_ENTRY_CHARS} gate`,
+    );
+  }
+  return trimmed;
+}
+const ENTRY_TEXT = checkedLine(ENTRY_LINE);
+
+// The excuse is an incident report: it must carry its report number,
+// or it is not the vacuum's paperwork at all.
+const REPORT_NUMBER = "47-B";
+if (!ENTRY_TEXT.includes(REPORT_NUMBER)) {
+  throw new Error(`entry line is missing incident report ${REPORT_NUMBER}`);
 }
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 // Write the line exactly, no trailing newline: the file stays at the
 // line's own byte count, and the tie-break favours the smaller text.
-writeFileSync(`${OUTPUT_DIR}/${OUTPUT_FILE}`, ENTRY_LINE.trim());
+writeFileSync(`${OUTPUT_DIR}/${OUTPUT_FILE}`, ENTRY_TEXT);
