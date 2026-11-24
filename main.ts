@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 
-// The vacuum's excuse, in its own deadpan voice.
+// The vacuum's excuse, filed in its own deadpan bureaucratic voice —
+// an incident report, not an apology.
 const ENTRY_LINE =
   "Per incident report 47-B, the sock entered a restricted zone wearing no hi-vis vest. I processed it accordingly.";
 
@@ -17,6 +18,6 @@ if (ENTRY_LINE.length < 1 || ENTRY_LINE.length > MAX_ENTRY_CHARS) {
 }
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
-// Write the line exactly: no trailing newline, so the file stays at the
-// line's own byte count (the tie-break favours the smaller text).
+// Write the line exactly, no trailing newline: the file stays at the
+// line's own byte count, and the tie-break favours the smaller text.
 writeFileSync(`${OUTPUT_DIR}/${OUTPUT_FILE}`, ENTRY_LINE.trim());
